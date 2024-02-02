@@ -31,8 +31,11 @@ const PlayerComponent: React.FC = () => {
     }, []); 
 
     return (
-        
-    )
-}
+        <mesh postion={[position.x, position.y, 0]}>
+            <boxGeometry />
+            <meshStandardMaterial />
+        </mesh>
+    );
+};
 
 export default PlayerComponent
