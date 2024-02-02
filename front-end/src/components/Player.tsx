@@ -7,16 +7,20 @@ const PlayerComponent: React.FC = () => {
         const handleKeyDown = (event: KeyboardEvent) => {
             switch (event.key) {
                 case 'w':
-                    setPosition((prev) => ({...prev, y: prev.y - 10}));
+                    setPosition((prev) => ({...prev, y: prev.y - 0.5}));
+                    console.log("pressed W");
                     break;
                 case 'a':
-                    setPosition((prev) => ({ ...prev, y: prev.x - 10 }));
+                    setPosition((prev) => ({ ...prev, y: prev.x - 0.5 }));
+                    console.log("pressed A");
                     break;
                 case 's':
-                    setPosition((prev) => ({ ...prev, y: prev.y + 10 }));
+                    setPosition((prev) => ({ ...prev, y: prev.y + 0.5 }));
+                    console.log("pressed S");
                     break;
                 case 'd':
-                    setPosition((prev) => ({ ...prev, y: prev.x + 10 }));
+                    setPosition((prev) => ({ ...prev, y: prev.x + 0.5 }));
+                    console.log("pressed D");
                     break;
             }
         };
