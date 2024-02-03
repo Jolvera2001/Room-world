@@ -4,7 +4,6 @@ interface Player {
     controllable: boolean;
     xCoords: number;
     yCoords: number;
-    zCoords: number;
 }
 
 export default Player;

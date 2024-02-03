@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Text } from '@react-three/drei'
 
 const PlayerComponent: React.FC = () => {
     const [position, setPosition] = useState({x: 0, y: 0});
@@ -15,8 +16,8 @@ const PlayerComponent: React.FC = () => {
 
         const updatePosition = () => {
             setPosition((prev) => ({
-              x: keysPressed['d'] ? prev.x + 0.1 : keysPressed['a'] ? prev.x - 0.1 : prev.x,
-              y: keysPressed['s'] ? prev.y - 0.1 : keysPressed['w'] ? prev.y + 0.1 : prev.y,
+              x: keysPressed['d'] ? prev.x + 0.05 : keysPressed['a'] ? prev.x - 0.05 : prev.x,
+              y: keysPressed['s'] ? prev.y - 0.05 : keysPressed['w'] ? prev.y + 0.05 : prev.y,
             }));
         };
 
@@ -25,7 +26,7 @@ const PlayerComponent: React.FC = () => {
         window.addEventListener('keyup', handleKeyUp);
 
         // update position continuously
-        const updateInterval = setInterval(updatePosition, 22.3);
+        const updateInterval = setInterval(updatePosition, 20);
 
         // detach listeners and clearInterval when not mounted
         return () => {
@@ -36,10 +37,15 @@ const PlayerComponent: React.FC = () => {
     }, [keysPressed]);
 
     return (
-        <mesh position={[position.x, position.y, 0]}>
-            <boxGeometry />
-            <meshStandardMaterial />
-        </mesh>
+        <>
+            <mesh position={[position.x, position.y, 0]} scale={0.625}>
+                <boxGeometry attach={ "geometry" } />
+                <meshStandardMaterial />
+            </mesh>
+            <Text>
+                x: {position.x.toFixed(2)} y: {position.y.toFixed(2)}
+            </Text>
+        </>
     );
 };
 
