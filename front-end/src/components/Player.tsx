@@ -38,11 +38,11 @@ const PlayerComponent: React.FC = () => {
 
     return (
         <>
-            <mesh position={[position.x, position.y, 0]} scale={0.625}>
+            <mesh position={[position.x, position.y, -1]} scale={0.625}>
                 <boxGeometry attach={ "geometry" } />
                 <meshStandardMaterial />
             </mesh>
-            <Text>
+            <Text position={[0, 3, 0]} scale={0.5}> 
                 x: {position.x.toFixed(2)} y: {position.y.toFixed(2)}
             </Text>
         </>
