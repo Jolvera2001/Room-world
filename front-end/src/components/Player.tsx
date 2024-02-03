@@ -2,37 +2,38 @@ import React, { useState, useEffect } from 'react';
 
 const PlayerComponent: React.FC = () => {
     const [position, setPosition] = useState({x: 0, y: 0});
+    const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            switch (event.key) {
-                case 'w':
-                    setPosition((prev) => ({...prev, y: prev.y + 0.5}));
-                    console.log("pressed W");
-                    break;
-                case 'a':
-                    setPosition((prev) => ({ ...prev, x: prev.x - 0.5 }));
-                    console.log("pressed A");
-                    break;
-                case 's':
-                    setPosition((prev) => ({ ...prev, y: prev.y - 0.5 }));
-                    console.log("pressed S");
-                    break;
-                case 'd':
-                    setPosition((prev) => ({ ...prev, x: prev.x + 0.5 }));
-                    console.log("pressed D");
-                    break;
-            }
+            setKeysPressed((prev: any) => ({ ...prev, [event.key]: true }));
+          };
+
+        const handleKeyUp = (event: KeyboardEvent) => {
+            setKeysPressed((prev: any) => ({ ...prev, [event.key]: false }));
         };
 
-        // attach listener when mounted
-        window.addEventListener('keydown', handleKeyDown);
+        const updatePosition = () => {
+            setPosition((prev) => ({
+              x: keysPressed['d'] ? prev.x + 0.1 : keysPressed['a'] ? prev.x - 0.1 : prev.x,
+              y: keysPressed['s'] ? prev.y - 0.1 : keysPressed['w'] ? prev.y + 0.1 : prev.y,
+            }));
+        };
 
-        // detach when not mounted
+        // attach listeners when mounted
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+
+        // update position continuously
+        const updateInterval = setInterval(updatePosition, 22.3);
+
+        // detach listeners and clearInterval when not mounted
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+            clearInterval(updateInterval);
         };
-    }, []); 
+    }, [keysPressed]);
 
     return (
         <mesh position={[position.x, position.y, 0]}>
