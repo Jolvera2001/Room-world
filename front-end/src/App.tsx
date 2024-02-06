@@ -1,6 +1,5 @@
 import { Canvas } from '@react-three/fiber'
 import Player from './components/Player'
-import DCanvas from './debug/DCanvas'
 
 function App() {
   return (
