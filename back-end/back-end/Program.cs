@@ -1,4 +1,7 @@
 using back_end.Hubs;
+using Microsoft.Extensions.Options;
+
+var testOrigin = "_testorigin";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,16 @@ builder.Services.AddSwaggerGen();
 // adding signalR
 builder.Services.AddSignalR();
 
+// configuring cross origin
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy(name: testOrigin,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173");
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,6 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(testOrigin);
 
 app.MapHub<RoomHub>("/room");
 

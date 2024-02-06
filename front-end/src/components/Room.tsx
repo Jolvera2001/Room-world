@@ -1,6 +1,5 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
-import { Text } from '@react-three/drei';
 import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 
@@ -9,7 +8,7 @@ const RoomComponent: React.FC = () => {
 
     useEffect(() => {
         const connection = new HubConnectionBuilder()
-            .withUrl("/room")
+            .withUrl("http://localhost:5117/room")
             .build();
 
         connection.start()
@@ -29,14 +28,14 @@ const RoomComponent: React.FC = () => {
 
 
     return (
-        <div className="bg-white">
+        <div className="bg-white h-screen">
             <Canvas>
                 <ambientLight intensity={0.50} />
-                <Text position={[-1, -1, 0]} scale={0.2}>
-                    playerCount: {playerCount}
-                </Text>
                 <Player />
             </Canvas>
+            <div>
+                <p> Player Count: {playerCount}</p>
+            </div>
         </div>
     )
 }
