@@ -1,6 +1,6 @@
 namespace SignalR_Server_Test;
 
-public class RoomHubConnection
+public class RoomTests
 {
     [Fact]
     public async void BasicConnection()
