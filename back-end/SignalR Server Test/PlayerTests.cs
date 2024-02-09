@@ -14,4 +14,9 @@ public class PlayerTests
         connection.State.Should().Be(HubConnectionState.Connected);
     }
 
+    public async Task UpdatePositon_SendsCoordsToPlayers()
+    {
+        
+    }
+
 }
