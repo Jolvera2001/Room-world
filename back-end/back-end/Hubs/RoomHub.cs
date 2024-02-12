@@ -7,8 +7,8 @@ namespace back_end.Hubs;
 public class RoomHub : Hub
 {
     // How this data structure is set up:
-    // [Room,[Playerid, Player()]]
-    private static ConcurrentDictionary<string, ConcurrentDictionary<string, Player>> playerConnections = new ConcurrentDictionary<string, ConcurrentDictionary<string, Player>>();
+    // [Room,[PlayerId, Player()]]
+    private static ConcurrentDictionary<string, ConcurrentDictionary<string, Player>> _playerConnections = new ConcurrentDictionary<string, ConcurrentDictionary<string, Player>>();
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync();
@@ -16,18 +16,18 @@ public class RoomHub : Hub
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         if (!string.IsNullOrEmpty(roomName))
         {
-            if (!playerConnections.ContainsKey(roomName))
+            if (!_playerConnections.ContainsKey(roomName))
             {
-                playerConnections[roomName] = new ConcurrentDictionary<string, Player>();
+                _playerConnections[roomName] = new ConcurrentDictionary<string, Player>();
             }
 
-            playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+            _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
         
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", playerConnections[roomName].Count);
+            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
         }
     }
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         await base.OnDisconnectedAsync(exception);
 
@@ -35,26 +35,34 @@ public class RoomHub : Hub
         if (!string.IsNullOrEmpty(roomName))
         {
 
-            if (playerConnections.ContainsKey(roomName))
+            if (_playerConnections.ContainsKey(roomName))
             {
                 Player? removedPlayer;
-                playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
+                _playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
             }
 
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", playerConnections[roomName].Count);
+            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
         }
+    }
+
+    public async Task updateRoom(string roomName, Player affected, string action)
+    {
+        // TODO: The room would need an updated list of its current players whenever someone joins or leaves
+        // action is either "left" or "joined"
+
+        Console.Write("Placeholder");
     }
 
     public async Task UpdatePosition(int deltaX, int deltaY)
     {
-        //TODO: Figure out if getting the delta or setting the position directly is better
+        //TODO: Test this on the frontend and refactor accordingly
         // The delta is figured out client side so the majority of the work is done on the client
         // The work here is updating the player position but applying the delta
 
         string playerId = Context.ConnectionId;
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         
-        if (playerConnections.TryGetValue(roomName, out var roomPlayers) 
+        if (_playerConnections.TryGetValue(roomName, out var roomPlayers) 
             && roomPlayers.TryGetValue(playerId, out Player playerToUpdate))
         {
             playerToUpdate.x += deltaX;
