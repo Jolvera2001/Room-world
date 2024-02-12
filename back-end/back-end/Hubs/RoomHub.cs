@@ -50,5 +50,19 @@ public class RoomHub : Hub
         //TODO: Figure out if getting the delta or setting the position directly is better
         // The delta is figured out client side so the majority of the work is done on the client
         // The work here is updating the player position but applying the delta
+
+        string playerId = Context.ConnectionId;
+        string roomName = Context.GetHttpContext().Request.Query["roomName"];
+        
+        if (playerConnections.TryGetValue(roomName, out var roomPlayers) 
+            && roomPlayers.TryGetValue(playerId, out Player playerToUpdate))
+        {
+            playerToUpdate.x += deltaX;
+            playerToUpdate.y += deltaY;
+            
+            // we might need to enforce boundary limits/checks later on
+
+            Clients.Group(roomName).SendAsync("PlayerPositionUpdated", playerId, playerToUpdate.x, playerToUpdate.y);
+        }
     }
 }
