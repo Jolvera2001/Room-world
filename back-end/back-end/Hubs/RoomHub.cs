@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Collections.Concurrent;
+using Microsoft.AspNetCore.SignalR;
+using back_end.Models;
 
 namespace back_end.Hubs;
 
 public class RoomHub : Hub
 {
-    // place to store players in our room
-    // roomname : set of playerIDs
-    private static Dictionary<string, HashSet<string>> roomPlayerConnections = new Dictionary<string, HashSet<string>>();
-
+    // How this data structure is set up:
+    // [Room,[Playerid, Player()]]
+    private static ConcurrentDictionary<string, ConcurrentDictionary<string, Player>> playerConnections = new ConcurrentDictionary<string, ConcurrentDictionary<string, Player>>();
     public override async Task OnConnectedAsync()
     {
         await base.OnConnectedAsync();
@@ -15,17 +16,14 @@ public class RoomHub : Hub
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         if (!string.IsNullOrEmpty(roomName))
         {
-            lock (roomPlayerConnections)
+            if (!playerConnections.ContainsKey(roomName))
             {
-                if (!roomPlayerConnections.ContainsKey(roomName))
-                {
-                    roomPlayerConnections[roomName] = new HashSet<string>();
-                }
-
-                roomPlayerConnections[roomName].Add(Context.ConnectionId);
+                playerConnections[roomName] = new ConcurrentDictionary<string, Player>();
             }
-            
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", roomPlayerConnections[roomName].Count);
+
+            playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+        
+            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", playerConnections[roomName].Count);
         }
     }
 
@@ -36,15 +34,35 @@ public class RoomHub : Hub
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         if (!string.IsNullOrEmpty(roomName))
         {
-            lock (roomPlayerConnections)
+
+            if (playerConnections.ContainsKey(roomName))
             {
-                if (roomPlayerConnections.ContainsKey(roomName))
-                {
-                    roomPlayerConnections[roomName].Remove(Context.ConnectionId);
-                }
-            } 
+                Player? removedPlayer;
+                playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
+            }
+
+            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", playerConnections[roomName].Count);
+        }
+    }
+
+    public async Task UpdatePosition(int deltaX, int deltaY)
+    {
+        //TODO: Figure out if getting the delta or setting the position directly is better
+        // The delta is figured out client side so the majority of the work is done on the client
+        // The work here is updating the player position but applying the delta
+
+        string playerId = Context.ConnectionId;
+        string roomName = Context.GetHttpContext().Request.Query["roomName"];
+        
+        if (playerConnections.TryGetValue(roomName, out var roomPlayers) 
+            && roomPlayers.TryGetValue(playerId, out Player playerToUpdate))
+        {
+            playerToUpdate.x += deltaX;
+            playerToUpdate.y += deltaY;
             
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", roomPlayerConnections[roomName].Count);
+            // we might need to enforce boundary limits/checks later on
+
+            Clients.Group(roomName).SendAsync("PlayerPositionUpdated", playerId, playerToUpdate.x, playerToUpdate.y);
         }
     }
 }
