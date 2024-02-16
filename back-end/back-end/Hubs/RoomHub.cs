@@ -45,13 +45,6 @@ public class RoomHub : Hub
         }
     }
 
-    public async Task updateRoom(string roomName, Player affected, string action)
-    {
-        // TODO: The room would need an updated list of its current players whenever someone joins or leaves
-        // action is either "left" or "joined"
-
-        Console.Write("Placeholder");
-    }
 
     public async Task UpdatePosition(int deltaX, int deltaY)
     {
