@@ -1,7 +1,7 @@
 // the purpose of this is to debug models and meshes on a more percievable plane
 // utilzing grids and such
-import React, { useState, useEffect, ReactNode } from 'react';
-import { Text, Grid } from '@react-three/drei'
+import React, { ReactNode } from 'react';
+import { Grid } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber';
 
 interface DCanvasProps {
