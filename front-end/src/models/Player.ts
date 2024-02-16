@@ -2,8 +2,8 @@ interface Player {
     username: string;
     interactions: number;
     controllable: boolean;
-    xCoords: number;
-    yCoords: number;
+    x: number;
+    y: number;
 }
 
 export default Player;

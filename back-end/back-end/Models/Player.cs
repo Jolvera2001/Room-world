@@ -8,7 +8,7 @@ public class Player
 
     public Player(string id)
     {
-        Id = Id;
+        Id = id;
     }
     
 }
