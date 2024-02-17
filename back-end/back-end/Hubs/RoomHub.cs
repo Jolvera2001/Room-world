@@ -14,6 +14,8 @@ public class RoomHub : Hub
         await base.OnConnectedAsync();
 
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
+
+        Console.WriteLine($"RoomName: {roomName}");
         if (!string.IsNullOrEmpty(roomName))
         {
             if (!_playerConnections.ContainsKey(roomName))
@@ -22,7 +24,9 @@ public class RoomHub : Hub
             }
 
             _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
-        
+
+            // add to group
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
         }
     }
