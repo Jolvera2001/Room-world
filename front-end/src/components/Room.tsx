@@ -5,10 +5,11 @@ import Player from "./Player";
 
 const RoomComponent: React.FC = () => {
     const [playerCount, setPlayerCount] = useState<number>(0);
+    const roomName = "test";
 
     useEffect(() => {
         const connection = new HubConnectionBuilder()
-            .withUrl("http://localhost:5117/room")
+            .withUrl(`http://localhost:5117/room?roomName=${roomName}`)
             .build();
 
         connection.start()

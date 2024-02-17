@@ -11,4 +11,7 @@ export default defineConfig({
       plugins: [tailwindcss, autoprefixer],
     },
   },
+  build: {
+    outDir: '../back-end/back-end/wwwroot'
+  }
 });

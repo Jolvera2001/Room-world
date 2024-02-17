@@ -37,6 +37,8 @@ app.UseHttpsRedirection();
 app.UseCors(testOrigin);
 
 app.MapHub<RoomHub>("/room");
-app.MapHub<PlayerHub>("/player");
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.Run();
