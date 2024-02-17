@@ -28,6 +28,8 @@ public class RoomHub : Hub
             // add to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
             await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
+
+            // TODO: Send the player list to the client
         }
     }
 
