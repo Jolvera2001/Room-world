@@ -23,13 +23,15 @@ public class RoomHub : Hub
                 _playerConnections[roomName] = new ConcurrentDictionary<string, Player>();
             }
 
-            _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+            // creating player to send ot group and add onto dict
+            Player newPlayer = new Player(Context.ConnectionId);
+            _playerConnections[roomName].TryAdd(Context.ConnectionId, newPlayer);
 
             // add to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName]);
 
-            // TODO: Send the player list to the client
+            // send in player list in respects to connected user
+            await Clients.Group(roomName).SendAsync("PlayerListAdd", newPlayer);
         }
     }
 
@@ -40,14 +42,12 @@ public class RoomHub : Hub
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         if (!string.IsNullOrEmpty(roomName))
         {
-
             if (_playerConnections.ContainsKey(roomName))
             {
                 Player? removedPlayer;
                 _playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
+                await Clients.Group(roomName).SendAsync("PlayerListRemove", removedPlayer);
             }
-
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName]);
         }
     }
 
