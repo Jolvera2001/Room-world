@@ -1,9 +1,7 @@
-interface Player {
-    username: string;
-    interactions: number;
-    controllable: boolean;
+interface PlayerType {
+    id: string;
     x: number;
     y: number;
 }
 
-export default Player;
+export default PlayerType;

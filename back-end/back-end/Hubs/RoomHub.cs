@@ -24,14 +24,17 @@ public class RoomHub : Hub
             }
 
             // creating player to send ot group and add onto dict
-            Player newPlayer = new Player(Context.ConnectionId);
-            _playerConnections[roomName].TryAdd(Context.ConnectionId, newPlayer);
+            _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+
+            // in respects to connection
+            ConcurrentDictionary<string, Player> respectedDict = _playerConnections[roomName];
+            respectedDict.TryRemove(Context.ConnectionId, out _);
 
             // add to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
 
             // send in player list in respects to connected user
-            await Clients.Group(roomName).SendAsync("PlayerListAdd", newPlayer);
+            await Clients.Group(roomName).SendAsync("PlayerListUpdate", respectedDict);
         }
     }
 
@@ -46,7 +49,11 @@ public class RoomHub : Hub
             {
                 Player? removedPlayer;
                 _playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
-                await Clients.Group(roomName).SendAsync("PlayerListRemove", removedPlayer);
+
+                ConcurrentDictionary<string, Player> respectedDict = _playerConnections[roomName];
+                respectedDict.TryRemove(Context.ConnectionId, out _);
+
+                await Clients.Group(roomName).SendAsync("PlayerListDisconnect", respectedDict);
             }
         }
     }
