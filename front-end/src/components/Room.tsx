@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 import PlayerType from "../models/Player";
+import CPlayerComponent from "./CPlayer";
 
 const RoomComponent: React.FC = () => {
     const [playerCount, setPlayerCount] = useState<number>(0);
@@ -51,6 +52,9 @@ const RoomComponent: React.FC = () => {
         <div className="bg-white h-screen">
             <Canvas>
                 <ambientLight intensity={0.50} />
+                {Object.values(playerList).map((player) => (
+                    <CPlayerComponent key={player.id} somePlayer={player} />
+                ))}
                 <Player />
             </Canvas>
             <div>
