@@ -61,10 +61,6 @@ public class RoomHub : Hub
 
     public async Task UpdatePosition(int deltaX, int deltaY)
     {
-        //TODO: Test this on the frontend and refactor accordingly
-        // The delta is figured out client side so the majority of the work is done on the client
-        // The work here is updating the player position but applying the delta
-
         string playerId = Context.ConnectionId;
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         

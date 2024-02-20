@@ -6,7 +6,6 @@ import PlayerType from "../models/Player";
 import CPlayerComponent from "./CPlayer";
 
 const RoomComponent: React.FC = () => {
-    const [playerCount, setPlayerCount] = useState<number>(0);
     const [playerList, setPlayerList] = useState<{[key: string]: PlayerType}>({});
     const roomName = "test";
 
@@ -22,11 +21,14 @@ const RoomComponent: React.FC = () => {
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
             setPlayerList(newPList);
+            console.log(playerList);
         });
 
         connection.on("PlayerListDisconnect", (newPList: { [key: string]: PlayerType }) => {
             console.log("player left");
             setPlayerList(newPList);
+            console.log(playerList);
+        });
 
         connection.on("PlayerPositionUpdated", (playerId: string, newX: number, newY: number) => {
             setPlayerList(prevPlayerList => ({
@@ -38,7 +40,6 @@ const RoomComponent: React.FC = () => {
                     }
                 }));
             });
-        });
 
         return () => {
             connection.stop()
@@ -57,9 +58,6 @@ const RoomComponent: React.FC = () => {
                 ))}
                 <Player />
             </Canvas>
-            <div>
-                <p> Player Count: {playerCount}</p>
-            </div>
         </div>
     )
 }
