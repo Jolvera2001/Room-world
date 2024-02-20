@@ -10,6 +10,7 @@ const RoomComponent: React.FC = () => {
     const roomName = "test";
 
     useEffect(() => {
+        console.log(playerList);
         const connection = new HubConnectionBuilder()
             .withUrl(`http://localhost:5117/room?roomName=${roomName}`)
             .build();
@@ -21,13 +22,11 @@ const RoomComponent: React.FC = () => {
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
             setPlayerList(newPList);
-            console.log(playerList);
         });
 
         connection.on("PlayerListDisconnect", (newPList: { [key: string]: PlayerType }) => {
             console.log("player left");
             setPlayerList(newPList);
-            console.log(playerList);
         });
 
         connection.on("PlayerPositionUpdated", (playerId: string, newX: number, newY: number) => {
@@ -46,7 +45,7 @@ const RoomComponent: React.FC = () => {
                 .then(() => console.log("SignalR connection stopped"))
                 .catch(err => console.error("Error stopping signalR connection", err));
         }; 
-    }, []);
+    }, [playerList]);
 
 
     return (
