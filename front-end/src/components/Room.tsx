@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 import PlayerType from "../models/Player";
 import CPlayerComponent from "./CPlayer";
+import PlayerComponent from "./Player";
 
 const RoomComponent: React.FC = () => {
     const [playerList, setPlayerList] = useState<{[key: string]: PlayerType}>({});
@@ -56,13 +57,18 @@ const RoomComponent: React.FC = () => {
                 }));
             });
 
+        const updatePlayerPosition = (deltaX: number, deltaY: number) => {
+            connection.invoke("PlayerPositionUpdated", deltaX, deltaY)
+                .then(() => console.log("position updated"))
+                .catch(err => console.error("Error updated position: ", err))
+        }
+
         return () => {
             connection.stop()
                 .then(() => console.log("SignalR connection stopped"))
                 .catch(err => console.error("Error stopping signalR connection", err));
         }; 
     }, []);
-
 
     return (
         <div className="bg-white h-screen">

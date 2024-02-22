@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Text } from '@react-three/drei'
+import PlayerType from '../models/Player';
 
-const PlayerComponent: React.FC = () => {
+interface PlayerComponentProps {
+    onPositionChange: (x: number, y: number) => void;
+}
+
+const PlayerComponent: React.FC<PlayerComponentProps> = ({ onPositionChange }) => {
     const [position, setPosition] = useState({x: 0, y: 0});
     const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
+
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -19,6 +25,8 @@ const PlayerComponent: React.FC = () => {
               x: keysPressed['d'] ? prev.x + 0.05 : keysPressed['a'] ? prev.x - 0.05 : prev.x,
               y: keysPressed['s'] ? prev.y - 0.05 : keysPressed['w'] ? prev.y + 0.05 : prev.y,
             }));
+
+            onPositionChange(position.x, position.y);
         };
 
         // attach listeners when mounted
@@ -34,7 +42,7 @@ const PlayerComponent: React.FC = () => {
             window.removeEventListener('keyup', handleKeyUp);
             clearInterval(updateInterval);
         };
-    }, [keysPressed]);
+    }, [keysPressed, onPositionChange, position.x, position.y]);
 
     return (
         <>
