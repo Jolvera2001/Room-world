@@ -11,6 +11,13 @@ const RoomComponent: React.FC = () => {
     const userId = useRef<string>("");
     const roomName = "test";
 
+    // TODO
+    const updatePlayerPosition = (deltaX: number, deltaY: number) => {
+        connection.invoke("PlayerPositionUpdated", deltaX, deltaY)
+            .then(() => console.log("position updated"))
+            .catch(err => console.error("Error updated position: ", err))
+    }
+
     useEffect(() => {
         console.table(playerList);
     }, [playerList]);
@@ -57,12 +64,6 @@ const RoomComponent: React.FC = () => {
                 }));
             });
 
-        const updatePlayerPosition = (deltaX: number, deltaY: number) => {
-            connection.invoke("PlayerPositionUpdated", deltaX, deltaY)
-                .then(() => console.log("position updated"))
-                .catch(err => console.error("Error updated position: ", err))
-        }
-
         return () => {
             connection.stop()
                 .then(() => console.log("SignalR connection stopped"))
@@ -77,7 +78,7 @@ const RoomComponent: React.FC = () => {
                 {Object.values(playerList).map((player) => (
                     <CPlayerComponent key={player.id} somePlayer={player} />
                 ))}
-                <Player />
+                <Player updatePlayerPosition={updatePlayerPosition}/>
             </Canvas>
         </div>
     )
