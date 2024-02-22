@@ -1,5 +1,5 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 import PlayerType from "../models/Player";
@@ -7,6 +7,7 @@ import CPlayerComponent from "./CPlayer";
 
 const RoomComponent: React.FC = () => {
     const [playerList, setPlayerList] = useState<{[key: string]: PlayerType}>({});
+    const userId = useRef<string>("");
     const roomName = "test";
 
     useEffect(() => {
@@ -21,17 +22,27 @@ const RoomComponent: React.FC = () => {
         connection.start()
             .then(() => console.log("SignalR connection established"))
             .catch(err => console.error("Error establishing SignalR connection:", err));
+        
+        if (connection.connectionId) {
+            userId.current = connection.connectionId;
+        }
 
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
-            console.log(newPList);
-            console.table(newPList);
-            setPlayerList(newPList);
+
+            const updatedPlayerList = {...newPList};
+            delete updatedPlayerList[userId.current];
+
+            setPlayerList(updatedPlayerList);
         });
 
         connection.on("PlayerListDisconnect", (newPList: { [key: string]: PlayerType }) => {
             console.log("player left");
-            setPlayerList(newPList);
+
+            const updatedPlayerList = { ...newPList };
+            delete updatedPlayerList[userId.current];
+
+            setPlayerList(updatedPlayerList);
         });
 
         connection.on("PlayerPositionUpdated", (playerId: string, newX: number, newY: number) => {
