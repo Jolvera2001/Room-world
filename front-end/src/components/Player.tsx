@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text } from '@react-three/drei'
-import PlayerType from '../models/Player';
 
-const PlayerComponent: React.FC<{updatePlayerPosition : (x: number, y: number) => void}> = (props) => {
+const PlayerComponent: React.FC = () => {
     const [position, setPosition] = useState({x: 0, y: 0});
     const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
 
@@ -37,10 +36,6 @@ const PlayerComponent: React.FC<{updatePlayerPosition : (x: number, y: number) =
             clearInterval(updateInterval);
         };
     }, [keysPressed]);
-
-    useEffect(() => {
-        props.updatePlayerPosition(position.x, position.y);
-    }, [position, props]);
 
     return (
         <>
