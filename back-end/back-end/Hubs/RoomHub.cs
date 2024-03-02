@@ -23,13 +23,16 @@ public class RoomHub : Hub
                 _playerConnections[roomName] = new ConcurrentDictionary<string, Player>();
             }
 
+            // creating player to send ot group and add onto dict
             _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+            Console.WriteLine(_playerConnections[roomName].Count);
 
             // add to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
 
-            // TODO: Send the player list to the client
+            var excludedClient = _playerConnections[roomName].ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            excludedClient.Remove(Context.ConnectionId);
+            await Clients.Client(Context.ConnectionId).SendAsync("PlayerListUpdate", excludedClient);
         }
     }
 
@@ -40,24 +43,19 @@ public class RoomHub : Hub
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         if (!string.IsNullOrEmpty(roomName))
         {
-
             if (_playerConnections.ContainsKey(roomName))
             {
                 Player? removedPlayer;
                 _playerConnections[roomName].TryRemove(Context.ConnectionId, out removedPlayer);
-            }
 
-            await Clients.Group(roomName).SendAsync("PlayerCountUpdated", _playerConnections[roomName].Count);
+                await Clients.Group(roomName).SendAsync("PlayerListDisconnect", _playerConnections[roomName]);
+            }
         }
     }
 
 
     public async Task UpdatePosition(int deltaX, int deltaY)
     {
-        //TODO: Test this on the frontend and refactor accordingly
-        // The delta is figured out client side so the majority of the work is done on the client
-        // The work here is updating the player position but applying the delta
-
         string playerId = Context.ConnectionId;
         string roomName = Context.GetHttpContext().Request.Query["roomName"];
         
