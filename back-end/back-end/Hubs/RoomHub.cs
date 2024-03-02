@@ -25,12 +25,14 @@ public class RoomHub : Hub
 
             // creating player to send ot group and add onto dict
             _playerConnections[roomName].TryAdd(Context.ConnectionId, new Player(Context.ConnectionId));
+            Console.WriteLine(_playerConnections[roomName].Count);
 
             // add to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
 
-            // send in player list in respects to connected user
-            await Clients.Group(roomName).SendAsync("PlayerListUpdate", _playerConnections[roomName]);
+            var excludedClient = _playerConnections[roomName].ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            excludedClient.Remove(Context.ConnectionId);
+            await Clients.Client(Context.ConnectionId).SendAsync("PlayerListUpdate", excludedClient);
         }
     }
 
