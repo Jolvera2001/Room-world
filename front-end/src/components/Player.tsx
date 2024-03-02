@@ -5,7 +5,7 @@ interface PlayerComponentProps {
     sendXAndYToParent: (x: number, y: number) => void;
 }
 
-const PlayerComponent: React.FC<PlayerComponentProps> = ({ sendXAndYToParent }) => {
+const PlayerComponent: React.FC<PlayerComponentProps> = () => {
     const [position, setPosition] = useState({x: 0, y: 0});
     const [keysPressed, setKeysPressed] = useState<{ [key: string]: boolean }>({});
 

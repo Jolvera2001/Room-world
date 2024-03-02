@@ -23,13 +23,19 @@ const RoomComponent: React.FC = () => {
         connection.start()
             .then(() => console.log("SignalR connection established"))
             .catch(err => console.error("Error establishing SignalR connection:", err))
-            .finally(() => {
-                setPlayerCID(connection.connectionId ? connection.connectionId : "");
-            });
+
+        setPlayerCID(connection.connectionId ? connection.connectionId : "");
+        console.log("Player CID: ", playerCID);
+        console.log("Player CID From Properties: ", connection.connectionId);
 
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
-            setPlayerList(newPList);
+
+            const filteredList = Object.fromEntries(
+                Object.entries(newPList).filter(([key]) => key !== playerCID)
+            )
+
+            setPlayerList(filteredList);
         });
 
         connection.on("PlayerListDisconnect", (newPList: { [key: string]: PlayerType }) => {
