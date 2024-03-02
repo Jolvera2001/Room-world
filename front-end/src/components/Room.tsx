@@ -8,6 +8,7 @@ import CPlayerComponent from "./CPlayer";
 const RoomComponent: React.FC = () => {
     const [playerList, setPlayerList] = useState<{[key: string]: PlayerType}>({});
     const roomName = "test";
+    const [playerCID, setPlayerCID] = useState<string>("");
     const connection = new HubConnectionBuilder().withUrl(`http://localhost:5117/room?roomName=${roomName}`).build();
 
     const getXY = (x: number, y: number) => {
@@ -21,7 +22,10 @@ const RoomComponent: React.FC = () => {
     useEffect(() => {
         connection.start()
             .then(() => console.log("SignalR connection established"))
-            .catch(err => console.error("Error establishing SignalR connection:", err));
+            .catch(err => console.error("Error establishing SignalR connection:", err))
+            .finally(() => {
+                setPlayerCID(connection.connectionId ? connection.connectionId : "");
+            });
 
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
