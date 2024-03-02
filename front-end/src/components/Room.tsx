@@ -1,5 +1,5 @@
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import Player from "./Player";
 import PlayerType from "../models/Player";
@@ -9,6 +9,10 @@ const RoomComponent: React.FC = () => {
     const [playerList, setPlayerList] = useState<{[key: string]: PlayerType}>({});
     const roomName = "test";
     const connection = new HubConnectionBuilder().withUrl(`http://localhost:5117/room?roomName=${roomName}`).build();
+
+    const getXY = (x: number, y: number) => {
+        console.log("x: ", x, "y: ", y);
+    }
 
     useEffect(() => {
         console.table(playerList);
@@ -54,7 +58,7 @@ const RoomComponent: React.FC = () => {
                 {Object.values(playerList).map((player) => (
                     <CPlayerComponent key={player.id} somePlayer={player} />
                 ))}
-                <Player />
+                <Player sendXAndYToParent={getXY}/>
             </Canvas>
         </div>
     )
