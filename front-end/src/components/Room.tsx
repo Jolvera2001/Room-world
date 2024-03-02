@@ -25,12 +25,7 @@ const RoomComponent: React.FC = () => {
 
         connection.on("PlayerListUpdate", (newPList: { [key:string]: PlayerType}) => {
             console.log("Player List Updated");
-
-            const filteredList = Object.fromEntries(
-                Object.entries(newPList).filter(([key]) => key !== playerCID)
-            )
-
-            setPlayerList(filteredList);
+            setPlayerList(newPList);
         });
 
         connection.on("PlayerListDisconnect", (newPList: { [key: string]: PlayerType }) => {
