@@ -32,7 +32,8 @@ public class RoomHub : Hub
 
             var excludedClient = _playerConnections[roomName].ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             excludedClient.Remove(Context.ConnectionId);
-            await Clients.Client(Context.ConnectionId).SendAsync("PlayerListUpdate", excludedClient);
+            
+            await Clients.Group(roomName).SendAsync("PlayerListUpdate", excludedClient);
         }
     }
 
